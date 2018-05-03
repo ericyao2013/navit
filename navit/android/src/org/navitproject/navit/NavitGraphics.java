@@ -1117,12 +1117,10 @@ public class NavitGraphics
 	/* These constants must be synchronized with enum draw_mode_num in graphics.h. */
 	private static final int draw_mode_begin = 0;
 	private static final int draw_mode_end = 1;
+	private static final int draw_mode_begin_clear = 2;
 
 	protected void draw_mode(int mode)
 	{
-		//Log.e("NavitGraphics", "draw_mode mode=" + mode + " parent_graphics="
-		//		+ String.valueOf(parent_graphics));
-
 		if (mode == draw_mode_end) {
 			if (parent_graphics == null) {
 				view.invalidate();
@@ -1130,7 +1128,7 @@ public class NavitGraphics
 				parent_graphics.view.invalidate(get_rect());
 			}
 		}
-		if (mode == draw_mode_begin && parent_graphics != null) {
+		if (mode == draw_mode_begin_clear || (mode == draw_mode_begin && parent_graphics != null)) {
 			draw_bitmap.eraseColor(0);
 		}
 
