@@ -16,7 +16,6 @@
 package org.navitproject.navit;
 
 import java.io.IOException;
-
 import android.content.Context;
 import android.hardware.Camera;
 import android.util.Log;
@@ -25,22 +24,17 @@ import android.view.SurfaceView;
 
 
 
-
 public class NavitCamera extends SurfaceView implements SurfaceHolder.Callback {
-	 SurfaceHolder mHolder;
-	Camera mCamera;
-
+    private Camera mCamera;
+    private final String TAG = "Navitcamera";
 
 
 	NavitCamera(Context context) 
 	{
 		super(context);
-		  mHolder = getHolder();
+        SurfaceHolder mHolder = getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-	    Log.e("NavitCamera","Creator");
-
-		
 	}
 
 
@@ -55,7 +49,7 @@ public class NavitCamera extends SurfaceView implements SurfaceHolder.Callback {
             mCamera = null;
             // TODO: add more exception handling logic here
         }
-	    Log.e("NavitCamera","surfaceCreated");
+	    Log.d(TAG,"surfaceCreated");
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -64,19 +58,18 @@ public class NavitCamera extends SurfaceView implements SurfaceHolder.Callback {
         // important to release it when the activity is paused.
         mCamera.stopPreview();
         mCamera = null;
-	    Log.e("NavitCamera","surfaceDestroyed");
+	    Log.d(TAG,"surfaceDestroyed");
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // Now that the size is known, set up the camera parameters and begin
         // the preview.
-	Log.e("NavitCamera","surfaceChanged "+w+"x"+h);
+	    Log.d(TAG,"surfaceChanged w = "+w+" ,x = "+h);
         mCamera.stopPreview();
         Camera.Parameters parameters = mCamera.getParameters();
         parameters.setPreviewSize(w, h);
         mCamera.setParameters(parameters);
         mCamera.startPreview();
     }
-
 }
 
