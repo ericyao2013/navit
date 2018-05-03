@@ -57,7 +57,9 @@
 #include <navit/android.h>
 #endif
 static struct map *global_map;
-
+static const int ORIENTATION_PORTRAIT = 0;
+static const int ORIENTATION_LANDSCAPE = 1;
+static const int ORIENTATION_FLAT = 2;
 int orientation,orientation_old;
 
 struct pedestrian {
@@ -1127,35 +1129,40 @@ android_sensors(struct navit *nav, int sensor, float *x, float *y, float *z)
 		return;
 	dbg(lvl_debug,"enter %d %f %f %f",sensor,*x,*y,*z);
 	if (sensor == 1) {
-		if (*x > 7.5)
-			orientation=1; /* landscape */
-		if (*y > 7.5)
-			orientation=0; /* portrait */
-		if (*z > 7.5)
-			orientation=2; /* flat */
-		dbg(lvl_debug,"orientation=%d",orientation);
+		if (*x > 7.5) {
+            orientation = ORIENTATION_LANDSCAPE;
+            dbg(lvl_debug,"orientation = LANDSCAPE");
+        }
+		if (*y > 7.5) {
+            orientation = ORIENTATION_PORTRAIT;
+            dbg(lvl_debug,"orientation = PORTRAIT");
+        }
+		if (*z > 7.5) {
+            orientation = ORIENTATION_FLAT;
+            dbg(lvl_debug, "orientation = FLAT");
+        }
 	}
-	if ((orientation_old == 2) != (orientation == 2)) {
+	if ((orientation_old == ORIENTATION_FLAT) != (orientation == ORIENTATION_FLAT)) {
 		struct attr attr, flags_graphics, osd_configuration;
-		navit_set_attr(nav, orientation == 2 ? &initial_layout:&main_layout);
+		navit_set_attr(nav, orientation == ORIENTATION_FLAT ? &initial_layout:&main_layout);
 		navit_get_attr(nav, attr_transformation, &attr, NULL);
-		transform_set_scale(attr.u.transformation, orientation == 2 ? 64:16);
-		flags_graphics.type=attr_flags_graphics;
-		flags_graphics.u.num=orientation == 2 ? 0:10;
+		transform_set_scale(attr.u.transformation, orientation == ORIENTATION_FLAT ? 64:16);
+		flags_graphics.type = attr_flags_graphics;
+		flags_graphics.u.num = orientation == ORIENTATION_FLAT ? 0:10;
 		navit_set_attr(nav, &flags_graphics);
-		osd_configuration.type=attr_osd_configuration;
-		osd_configuration.u.num=orientation == 2 ? 1:2;
+		osd_configuration.type = attr_osd_configuration;
+		osd_configuration.u.num = orientation == ORIENTATION_FLAT ? 1:2;
 		navit_set_attr(nav, &osd_configuration);
 	}
 	orientation_old=orientation;
 	switch (orientation) {
-	case 2:
+	case ORIENTATION_FLAT:
 		if (sensor == 2) {
 			yaw=atan2f(-*y,-*x)*180/M_PI+180;
 		}
 		pitch=0;
 		break;
-	case 1:
+	case ORIENTATION_LANDSCAPE:
 		if (sensor == 1) {
 			pitch=atan2f(*x,*z)*180/M_PI;	
 		}
@@ -1163,7 +1170,7 @@ android_sensors(struct navit *nav, int sensor, float *x, float *y, float *z)
 			yaw=atan2f(-*y,*z)*180/M_PI+180;
 		}
 		break;
-	case 0:
+	case ORIENTATION_PORTRAIT:
 		if (sensor == 1) {
 			pitch=atan2f(*y,*z)*180/M_PI;
 		}
@@ -1175,7 +1182,7 @@ android_sensors(struct navit *nav, int sensor, float *x, float *y, float *z)
 	if (navit_get_attr(nav, attr_transformation, &attr, NULL)) {
 		struct transformation *trans=attr.u.transformation;
 		if (sensor == 1) {
-			if (orientation != 2)
+			if (orientation != ORIENTATION_FLAT)
 				pitch+=2.0;
 			transform_set_pitch(trans, (int)pitch);
 			dbg(lvl_debug,"pich %d %f",orientation,pitch);
@@ -1188,7 +1195,7 @@ android_sensors(struct navit *nav, int sensor, float *x, float *y, float *z)
 			pedestrian_data.yaw=attr.u.num;
 			navit_set_attr(nav, &attr);
 			dbg(lvl_debug,"yaw %d %f",orientation,yaw);
-			if (orientation == 2) 
+			if (orientation == ORIENTATION_FLAT)
 				navit_set_center_cursor(nav, 1, 0);
 		}
 	}
