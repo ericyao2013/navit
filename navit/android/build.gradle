@@ -16,7 +16,7 @@ android {
         }
         externalNativeBuild {
             cmake {
-                arguments '-DUSE_PLUGINS=n', '-DBUILD_MAPTOOL=n', '-DXSL_PROCESSING=n', '-DSAMPLE_MAP=n'
+                arguments '-DUSE_PLUGINS=n', '-DBUILD_MAPTOOL=n', '-DXSL_PROCESSING=n', '-DSAMPLE_MAP=n', '-DENABLE_ROLL=y'
             }
         }
         // https://github.com/googlesamples/android-ndk/blob/master/native-media/app/build.gradle
